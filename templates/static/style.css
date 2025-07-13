@@ -1,17 +1,418 @@
+/*
+========================================
+NETWORK MONITORING DASHBOARD - CUSTOM STYLES
+========================================
+
+A modern, responsive stylesheet for the Network Monitoring Dashboard
+Built with Bootstrap 5 enhancements and custom animations
+
+Author: Sangam Gupta
+Features: Responsive design, smooth animations, modern UI components
+========================================
+*/
+
+/* 
+========================================
+GLOBAL STYLES & TYPOGRAPHY
+========================================
+Base styles that apply to the entire application
+*/
 body {
-    font-family: Arial, sans-serif;
-    padding: 20px;
-    background-color: #f2f2f2;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    min-height: 100vh;
 }
-h1 {
-    color: #333;
+
+/* 
+========================================
+NAVIGATION BAR STYLING
+========================================
+Enhanced navigation with smooth hover effects and responsive design
+*/
+.navbar-brand {
+    font-size: 1.5rem;
+    letter-spacing: 0.5px;
 }
-table {
+
+.navbar-nav .nav-link {
+    font-weight: 500;
+    transition: all 0.3s ease;
+    border-radius: 6px;
+    margin: 0 4px;
+    padding: 8px 16px !important;
+}
+
+.navbar-nav .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+}
+
+/* 
+========================================
+CARD COMPONENTS
+========================================
+Modern card styling with glassmorphism effects and hover animations
+*/
+.card {
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1) !important;
+}
+
+/* 
+========================================
+DATA TABLE STYLING
+========================================
+Enhanced table design with hover effects and responsive layout
+Perfect for displaying network device information
+*/
+.table {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Table header with gradient background */
+.table thead th {
+    background: linear-gradient(135deg, #343a40 0%, #495057 100%) !important;
+    border: none;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+}
+
+/* Table row hover effects */
+.table tbody tr {
+    transition: all 0.2s ease;
+    border: none;
+}
+
+.table tbody tr:hover {
+    background-color: rgba(13, 110, 253, 0.08) !important;
+    transform: scale(1.01);
+}
+
+/* Alternating row colors for better readability */
+.table-striped tbody tr:nth-of-type(odd) {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+.table-striped tbody tr:nth-of-type(even) {
+    background-color: rgba(255, 255, 255, 0.8);
+}
+
+/* Device row specific styling */
+.device-row td {
+    vertical-align: middle;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* 
+========================================
+STATUS BADGES & INDICATORS
+========================================
+Color-coded badges for device status (Online/Offline)
+*/
+.badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    padding: 6px 12px;
+    border-radius: 20px;
+}
+
+/* 
+========================================
+BUTTON STYLING & INTERACTIONS
+========================================
+Enhanced buttons with hover effects and smooth transitions
+*/
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+}
+
+.btn-outline-primary:hover {
+    box-shadow: 0 4px 12px rgba(13, 110, 253, 0.3);
+}
+
+.btn-outline-secondary:hover {
+    box-shadow: 0 4px 12px rgba(108, 117, 125, 0.3);
+}
+
+/* Form Enhancements */
+.form-control {
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
+.input-group-text {
+    border-radius: 8px 0 0 8px;
+    background-color: rgba(13, 110, 253, 0.1);
+    border-color: rgba(13, 110, 253, 0.2);
+    color: #0d6efd;
+}
+
+.form-select {
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+/* Header Section */
+.display-6 {
+    font-weight: 700;
+    letter-spacing: -0.5px;
+}
+
+/* 
+========================================
+FOOTER SECTION
+========================================
+Clean footer with animated heart and creator attribution
+*/
+footer {
+    background: #f8f9fa !important;
+    border-top: 1px solid #dee2e6 !important;
+    position: relative;
+    bottom: 0;
     width: 100%;
-    background-color: white;
-    border-collapse: collapse;
 }
-th, td {
-    padding: 10px;
-    text-align: left;
+
+footer p {
+    font-size: 1rem;
+    color: #6c757d !important;
+    margin: 0;
+}
+
+/* Animated heart icon */
+footer .text-danger {
+    color: #dc3545 !important;
+    font-size: 1.1rem;
+    animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+footer .text-primary {
+    color: #0d6efd !important;
+}
+
+/* Heartbeat animation for the heart emoji */
+@keyframes heartbeat {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+/* Ensure footer stays at bottom of page */
+body {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.container-fluid {
+    flex: 1;
+}
+
+/* Empty State */
+.text-center i.display-1 {
+    opacity: 0.3;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.3; }
+    50% { opacity: 0.6; }
+    100% { opacity: 0.3; }
+}
+
+/* Responsive Adjustments */
+@media (max-width: 992px) {
+    .col-lg-9, .col-lg-3 {
+        margin-bottom: 2rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .container-fluid {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+    
+    .display-6 {
+        font-size: 1.8rem;
+    }
+    
+    .d-flex.justify-content-between {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .text-end {
+        text-align: center !important;
+        margin-top: 1rem;
+    }
+    
+    .table-responsive {
+        font-size: 0.9rem;
+    }
+    
+    .btn-sm {
+        padding: 0.25rem 0.5rem;
+        font-size: 0.75rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar-brand {
+        font-size: 1.2rem;
+    }
+    
+    .badge.fs-6 {
+        font-size: 0.8rem !important;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .table thead th {
+        font-size: 0.75rem;
+        padding: 0.5rem;
+    }
+    
+    .table tbody td {
+        padding: 0.5rem;
+        font-size: 0.85rem;
+    }
+    
+    .btn-group-sm .btn {
+        padding: 0.2rem 0.4rem;
+        font-size: 0.7rem;
+    }
+}
+
+/* Loading Animation */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid rgba(255, 255, 255, 0.3);
+    border-radius: 50%;
+    border-top-color: #fff;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #a8a8a8;
+}
+
+/* Utility Classes */
+.font-monospace {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 0.9rem;
+    background-color: rgba(0, 0, 0, 0.05);
+    padding: 2px 6px;
+    border-radius: 4px;
+}
+
+.text-light-emphasis {
+    color: rgba(255, 255, 255, 0.75) !important;
+}
+
+/* 
+========================================
+ANIMATIONS & TRANSITIONS
+========================================
+Smooth animations for table rows and interactive elements
+*/
+
+/* Staggered fade-in animation for device table rows */
+.device-row {
+    animation: fadeInUp 0.4s ease forwards;
+    opacity: 0;
+    transform: translateY(10px);
+}
+
+/* Staggered animation delays for each row */
+.device-row:nth-child(1) { animation-delay: 0.1s; }
+.device-row:nth-child(2) { animation-delay: 0.15s; }
+.device-row:nth-child(3) { animation-delay: 0.2s; }
+.device-row:nth-child(4) { animation-delay: 0.25s; }
+.device-row:nth-child(5) { animation-delay: 0.3s; }
+.device-row:nth-child(6) { animation-delay: 0.35s; }
+.device-row:nth-child(7) { animation-delay: 0.4s; }
+.device-row:nth-child(8) { animation-delay: 0.45s; }
+
+/* Fade-in-up animation keyframes */
+@keyframes fadeInUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Settings Panel Enhancements */
+.form-check-input:checked {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+}
+
+.form-check-input:focus {
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+}
+
+/* Network Stats Card */
+.card-header {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Hover effects for action buttons */
+.btn-outline-primary:hover {
+    background-color: #0d6efd;
+    border-color: #0d6efd;
+    color: white;
+}
+
+.btn-outline-secondary:hover {
+    background-color: #6c757d;
+    border-color: #6c757d;
+    color: white;
 }

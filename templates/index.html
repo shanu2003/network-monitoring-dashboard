@@ -1,24 +1,397 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Network Monitoring Dashboard</title>
-    <link rel="stylesheet" href="/static/style.css">
+    
+    <!-- Bootstrap 5 CSS Framework for modern, responsive design -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons for beautiful, consistent iconography -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    
+    <!-- Custom CSS for enhanced styling and animations -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Active Devices on Network</h1>
-    <table border="1">
-        <tr>
-            <th>IP Address</th>
-            <th>MAC Address</th>
-            <th>Status</th>
-        </tr>
-        {% for host in hosts %}
-        <tr>
-            <td>{{ host.ip }}</td>
-            <td>{{ host.mac }}</td>
-            <td>{{ host.status }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+    <!-- 
+    ========================================
+    NAVIGATION BAR
+    ========================================
+    Modern, responsive navigation with branding and menu items
+    -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
+        <div class="container-fluid">
+            <!-- Brand logo and title -->
+            <a class="navbar-brand fw-bold" href="#">
+                <i class="bi bi-router me-2"></i>
+                Network Monitor
+            </a>
+            
+            <!-- Mobile menu toggle button -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <!-- Navigation menu items -->
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#"><i class="bi bi-house me-1"></i>Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="refreshNetworkScan()"><i class="bi bi-arrow-clockwise me-1"></i>Refresh</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#"><i class="bi bi-gear me-1"></i>Settings</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 
+    ========================================
+    MAIN DASHBOARD CONTENT
+    ========================================
+    -->
+    <div class="container-fluid py-4">
+        <div class="row">
+            <!-- 
+            ========================================
+            PRIMARY CONTENT AREA (Left Side)
+            ========================================
+            -->
+            <div class="col-lg-9 col-md-8">
+                <!-- Dashboard header with title and device count -->
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <div>
+                        <h1 class="display-6 fw-bold text-dark mb-1">
+                            <i class="bi bi-wifi text-primary me-2"></i>
+                            Network Device Scanner
+                        </h1>
+                        <p class="text-muted mb-0">Monitor and discover devices on your network</p>
+                    </div>
+                    <div class="text-end">
+                        <!-- Dynamic device count badge -->
+                        <span class="badge bg-success fs-6 px-3 py-2">
+                            <i class="bi bi-check-circle me-1"></i>
+                            {{ hosts|length }} Devices Found
+                        </span>
+                    </div>
+                </div>
+
+                <!-- 
+                ========================================
+                NETWORK SCAN CONFIGURATION FORM
+                ========================================
+                Allows users to specify custom subnet ranges for scanning
+                -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title fw-bold mb-3">
+                            <i class="bi bi-search text-primary me-2"></i>
+                            Network Scan Configuration
+                        </h5>
+                        
+                        <!-- Form for subnet input and scan controls -->
+                        <form method="POST" action="/" class="row g-3 align-items-end">
+                            <!-- Subnet input field -->
+                            <div class="col-md-6">
+                                <label for="subnet" class="form-label fw-semibold">Subnet Range</label>
+                                <div class="input-group">
+                                    <span class="input-group-text"><i class="bi bi-globe"></i></span>
+                                    <input type="text" class="form-control" id="subnet" name="subnet" 
+                                           value="{{ subnet or '192.168.1.0/24' }}" 
+                                           placeholder="e.g., 192.168.1.0/24">
+                                </div>
+                                <div class="form-text">Enter the network range to scan (CIDR notation)</div>
+                            </div>
+                            
+                            <!-- Scan button -->
+                            <div class="col-md-3">
+                                <button type="submit" class="btn btn-primary w-100">
+                                    <i class="bi bi-search me-2"></i>Scan Network
+                                </button>
+                            </div>
+                            
+                            <!-- Refresh button -->
+                            <div class="col-md-3">
+                                <button type="button" class="btn btn-outline-secondary w-100" onclick="refreshNetworkScan()">
+                                    <i class="bi bi-arrow-clockwise me-2"></i>Refresh
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Device Table -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-light border-0">
+                        <h5 class="card-title mb-0 fw-bold">
+                            <i class="bi bi-list-ul text-primary me-2"></i>
+                            Discovered Devices
+                        </h5>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if hosts|length > 0 %}
+                        <div class="table-responsive">
+                            <table class="table table-hover table-striped mb-0">
+                                <thead class="table-dark">
+                                    <tr>
+                                        <th scope="col" class="px-4 py-3">
+                                            <i class="bi bi-hash me-2"></i>#
+                                        </th>
+                                        <th scope="col" class="px-4 py-3">
+                                            <i class="bi bi-globe me-2"></i>IP Address
+                                        </th>
+                                        <th scope="col" class="px-4 py-3">
+                                            <i class="bi bi-hdd-network me-2"></i>MAC Address
+                                        </th>
+                                        <th scope="col" class="px-4 py-3">
+                                            <i class="bi bi-pc-display me-2"></i>Hostname
+                                        </th>
+                                        <th scope="col" class="px-4 py-3">
+                                            <i class="bi bi-activity me-2"></i>Status
+                                        </th>
+                                        <th scope="col" class="px-4 py-3 text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for host in hosts %}
+                                    <tr class="device-row">
+                                        <td class="px-4 py-3 fw-semibold">{{ loop.index }}</td>
+                                        <td class="px-4 py-3">
+                                            <span class="font-monospace fw-semibold text-primary">{{ host.ip }}</span>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <span class="font-monospace text-muted">{{ host.mac }}</span>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            <span class="text-dark">{{ host.hostname or 'Unknown' }}</span>
+                                        </td>
+                                        <td class="px-4 py-3">
+                                            {% if host.status == 'up' %}
+                                                <span class="badge bg-success">
+                                                    <i class="bi bi-check-circle me-1"></i>Online
+                                                </span>
+                                            {% else %}
+                                                <span class="badge bg-danger">
+                                                    <i class="bi bi-x-circle me-1"></i>Offline
+                                                </span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="px-4 py-3 text-center">
+                                            <button class="btn btn-outline-primary btn-sm me-1" title="View Details">
+                                                <i class="bi bi-info-circle"></i>
+                                            </button>
+                                            <button class="btn btn-outline-secondary btn-sm" title="Ping Device">
+                                                <i class="bi bi-wifi"></i>
+                                            </button>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                        {% else %}
+                        <!-- Empty State -->
+                        <div class="text-center py-5">
+                            <i class="bi bi-wifi-off display-1 text-muted mb-3"></i>
+                            <h4 class="text-muted">No Devices Found</h4>
+                            <p class="text-muted mb-4">No active devices were detected on the specified network range.</p>
+                            <button class="btn btn-primary" onclick="refreshScan()">
+                                <i class="bi bi-arrow-clockwise me-2"></i>Scan Again
+                            </button>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- 
+            ========================================
+            SETTINGS SIDEBAR (Right Side)
+            ========================================
+            Configuration panel for scan settings and controls
+            -->
+            <div class="col-lg-3 col-md-4">
+                <!-- Settings panel -->
+                <div class="card shadow-sm border-0 mb-4">
+                    <div class="card-header bg-light border-0">
+                        <h5 class="card-title mb-0 fw-bold">
+                            <i class="bi bi-gear text-primary me-2"></i>
+                            Settings
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <!-- Scan timeout configuration -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Scan Timeout</label>
+                            <select class="form-select form-select-sm">
+                                <option value="5">5 seconds</option>
+                                <option value="10" selected>10 seconds</option>
+                                <option value="30">30 seconds</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Auto refresh toggle -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Auto Refresh</label>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="autoRefreshToggle">
+                                <label class="form-check-label" for="autoRefreshToggle">
+                                    Enable auto refresh
+                                </label>
+                            </div>
+                        </div>
+                        
+                        <!-- Refresh interval selection -->
+                        <div class="mb-3">
+                            <label class="form-label fw-semibold">Refresh Interval</label>
+                            <select class="form-select form-select-sm">
+                                <option value="30">30 seconds</option>
+                                <option value="60" selected>1 minute</option>
+                                <option value="300">5 minutes</option>
+                            </select>
+                        </div>
+                        
+                        <hr>
+                        
+                        <!-- Action buttons -->
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-primary btn-sm">
+                                <i class="bi bi-download me-2"></i>Export Results
+                            </button>
+                            <button class="btn btn-outline-secondary btn-sm">
+                                <i class="bi bi-arrow-clockwise me-2"></i>Clear Cache
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Network Stats -->
+                <div class="card shadow-sm border-0">
+                    <div class="card-header bg-light border-0">
+                        <h5 class="card-title mb-0 fw-bold">
+                            <i class="bi bi-bar-chart text-primary me-2"></i>
+                            Network Stats
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted">Total Devices:</span>
+                            <span class="fw-bold">{{ hosts|length }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted">Online:</span>
+                            <span class="fw-bold text-success">{{ hosts|selectattr('status', 'equalto', 'up')|list|length }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <span class="text-muted">Offline:</span>
+                            <span class="fw-bold text-danger">{{ hosts|selectattr('status', 'equalto', 'down')|list|length }}</span>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span class="text-muted">Last Scan:</span>
+                            <span class="fw-bold" id="lastScanTime"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 
+    ========================================
+    FOOTER SECTION
+    ========================================
+    Clean, centered footer with creator attribution
+    -->
+    <footer class="bg-light text-muted py-4 mt-5 border-top">
+        <div class="container-fluid">
+            <div class="text-center">
+                <p class="mb-0 fw-medium">
+                    Made with <span class="text-danger">❤️</span> by <span class="text-primary fw-bold">Sangam Gupta</span>
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- 
+    ========================================
+    CUSTOM JAVASCRIPT
+    ========================================
+    Interactive functionality for the dashboard
+    -->
+    <script>
+        // Update the last scan time display with current time
+        document.getElementById('lastScanTime').textContent = new Date().toLocaleTimeString();
+        
+        /**
+         * Refresh the network scan by reloading the page
+         * This function is called when user clicks refresh buttons
+         */
+        function refreshNetworkScan() {
+            console.log('🔄 Refreshing network scan...');
+            location.reload();
+        }
+        
+        // Auto refresh functionality
+        let autoRefreshInterval;
+        
+        // Set up auto refresh toggle functionality
+        document.getElementById('autoRefreshToggle').addEventListener('change', function() {
+            if (this.checked) {
+                console.log('✅ Auto refresh enabled');
+                // Set up automatic refresh every minute
+                autoRefreshInterval = setInterval(refreshNetworkScan, 60000);
+            } else {
+                console.log('❌ Auto refresh disabled');
+                // Clear the automatic refresh interval
+                clearInterval(autoRefreshInterval);
+            }
+        });
+        
+        // Add loading state to scan button when form is submitted
+        document.querySelector('form').addEventListener('submit', function() {
+            const scanButton = this.querySelector('button[type="submit"]');
+            
+            // Show loading state with spinner
+            scanButton.innerHTML = '<span class="spinner-border spinner-border-sm me-2" role="status"></span>Scanning...';
+            scanButton.disabled = true;
+            
+            // Show loading message
+            showLoadingMessage();
+            
+            console.log('🔍 Starting fast network scan...');
+        });
+        
+        // Show loading message function
+        function showLoadingMessage() {
+            const deviceTable = document.querySelector('.card-body');
+            if (deviceTable) {
+                const loadingHtml = `
+                    <div class="text-center py-5" id="loadingIndicator">
+                        <div class="spinner-border text-primary mb-3" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <h5 class="text-muted">Scanning Network...</h5>
+                        <p class="text-muted">Please wait while we discover devices on your network</p>
+                    </div>
+                `;
+                deviceTable.innerHTML = loadingHtml;
+            }
+        }
+        
+        // Log when dashboard is fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 Network Monitoring Dashboard loaded successfully');
+            console.log('📊 Dashboard features: Network scanning, device discovery, responsive design');
+        });
+    </script>
 </body>
 </html>
