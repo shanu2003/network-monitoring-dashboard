@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Network Monitoring Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Active Devices on Network</h1>
+    <table border="1">
+        <tr>
+            <th>IP Address</th>
+            <th>MAC Address</th>
+            <th>Status</th>
+        </tr>
+        {% for host in hosts %}
+        <tr>
+            <td>{{ host.ip }}</td>
+            <td>{{ host.mac }}</td>
+            <td>{{ host.status }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</body>
+</html>
